@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>That's A Wrap</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .title {
+            margin-top: 20%;
+            font-size: 2em;
+        }
+        .connect-button {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">That's A Wrap</div>
+        <button class="connect-button" onclick="connectSpotify()">Connect to Spotify</button>
+</body>
+</html>
+{% endblock %}
+
