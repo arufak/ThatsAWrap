@@ -5,12 +5,52 @@ from . import db   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv 
 import os
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth 
 
 auth = Blueprint('auth', __name__)
 load_dotenv() 
 
 spotify_client_id = os.getenv('SPOTIFY_CLIENT_ID')
 spotify_client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
+
+
+# route to initialize spotify authorization flow
+@auth.route('/spotifyLogin')
+def spotify_login():
+    sp_oauth = create_spotify_oauth()
+    auth_url = sp_oauth.get_authorize_url()
+    return redirect(auth_url)
+
+# Route for the redirect_uri endpoint specified in Spotify Developer Dashboard
+def spotify_callback():
+    sp_oauth = create_spotify_oauth()
+    user_id=session.get("user_id")
+    auth_code = request.args.get('code')
+    temp_token_info = sp_oauth.get_access_token(auth_code)
+    access_token = temp_token_info['access_token']
+    token_expiration = temp_token_info['expires_at']
+    refresh_token = temp_token_info['refresh_token']
+    update_user = User.query.filter_by(id=user_id).first()
+    update_user.spotifyToken = access_token
+    update_user.spotifyExpiration = token_expiration
+    update_user.spotifyRefresh = refresh_token
+    db.session.commit()
+    # Now you can use token_info['access_token'] to make authenticated calls to Spotify's API
+    # You would typically store the token in the user's session or database
+    # ...
+    # Redirect the user to another page, such as the home page or a profile page
+    return redirect('http://localhost:5000/callback')
+
+def create_spotify_oauth():
+    return SpotifyOAuth(
+        client_id=spotify_client_id,
+        client_secret=spotify_client_secret,
+        redirect_uri="http://localhost:5000/callback",
+        scope='user-library-read user-library-modify playlist-modify-private ugc-image-upload'
+    )
+
+# user registration, login, and logout 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -73,6 +113,7 @@ def sign_up():
 @login_required
 def home():
     return render_template('home.html')
+
 
 
 

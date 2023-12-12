@@ -33,7 +33,7 @@
 </head>
 <body>
     <div class="title">That's A Wrap</div>
-        <button class="connect-button" onclick="connectSpotify()">Connect to Spotify</button>
+    <a href="{{ url_for('auth.spotify_login') }}" class="connect-button">Connect to Spotify</a>
 </body>
 </html>
 {% endblock %}
