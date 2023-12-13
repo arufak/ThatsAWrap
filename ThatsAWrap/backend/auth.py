@@ -5,12 +5,26 @@ from . import db   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv 
 import os
+from spotify.spotifyOAuth import create_spotify_oauth, spotify_redirect
+
 
 auth = Blueprint('auth', __name__)
+bp = Blueprint('spotify', __name__, url_prefix='/spotify')
+
 load_dotenv() 
 
 spotify_client_id = os.getenv('SPOTIFY_CLIENT_ID')
 spotify_client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
+
+@bp.route('/authorize')
+def authorize():
+    return redirect(create_spotify_oauth().get_authorize_url())
+
+@bp.route('/redirect')
+def redirect():
+    code = request.args.get('code')
+    spotify_redirect(code)
+    return redirect(url_for('views.profile'))
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -74,6 +88,7 @@ def sign_up():
 def home():
     return render_template('home.html')
 
-
+def get_user_by_id(user_id):
+    return User.query.get(int(user_id))
 
 
